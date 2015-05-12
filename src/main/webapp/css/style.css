@@ -1,0 +1,103 @@
+@charset "utf-8";
+.message {
+	float: left;
+	width: 97%;
+	height: auto;
+	margin-bottom: 1%;
+	border-bottom: thin solid #D5D5D5;
+}
+body{}
+table{
+}
+
+input.in{
+	background: #FEB994;
+	color: #852A4B;
+
+}
+
+textarea{
+	border-radius: 8px 0 0 0;
+	background: #FEB994;
+	color: #852A4B;
+}
+
+input.addMailButton {
+	border-radius: 30%;
+	font-weight: 700;
+	color: white;
+	text-decoration: none;
+	padding: .8em 1em calc(.8em + 3px);
+
+	background: #CC0052;
+	box-shadow: 0 -3px #660029 inset;
+	transition: 0.2s;
+}
+input.addMailButton:hover { background: #660029; }
+input.addMailButton:active {
+	background: #FF66A3;
+	box-shadow: 0 3px #FF66A3 inset;
+}
+
+h1{
+	font-family:Showcard Gothic;color:#852A4B;text-align:center;background-color:#361451;
+}
+
+fieldset{
+	background:#C12853;height:400px;width:90px;padding:10px;padding-bottom: 120px;
+}
+
+p{
+	font-size:110%;
+}
+a.button {
+	position: relative;
+	display: inline-block;
+	font-size: 15px;
+	font-weight: bold;
+	color: white;
+
+	text-decoration: none;
+	user-select: none;
+	margin: .1em;
+	padding: .5em .6em .4em .6em;
+	border-radius: 8px;
+	border-top: 1px solid rgba(255,255,255,.1);
+	border-bottom: 1px solid rgba(0,0,0,.1);
+	outline: none;
+	background: #CC0052
+	radial-gradient(rgba(255,255,255,0), rgba(255,255,255,.5));
+	box-shadow:
+	inset rgba(255,255,255,.6) 0 .3em .3em,
+	inset rgba(0,0,0,.2) 0 -.1em .3em,
+	#CC0052 0 7px 1px,
+	rgba(0,0,0,.2) 0 .5em 5px;
+	transition: background .2s ease-in-out;
+}
+a.button:hover {
+	background-color: rgb(255,128,192);
+}
+a.button:active {
+	top: .2em;
+	color: rgba(254,255,255,.9);
+	text-shadow: rgba(0,0,0,.2) 0 1px 2px;
+	box-shadow:
+	inset rgba(255,255,255,.6) 0 .3em .3em,
+	inset rgba(0,0,0,.2) 0 -.1em .3em,
+	rgba(0,0,0,.4) 0 .1em 1px,
+	rgba(0,0,0,.3) 0 .2em 6px;
+}
+a.button:after {
+	content:  "";
+	position:  absolute;
+	width:   90%;
+	height:  60%;
+	top:   0;
+	left:   5%;
+	border-radius:    .5em .5em 1em 1em / .5em .5em 2em 2em;
+	background-image: linear-gradient(rgba(255,255,255,.55), rgba(255,255,255,.3));
+}
+.button:active:after {
+	opacity: .6;
+}
+
