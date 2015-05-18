@@ -120,7 +120,8 @@ public final class ChatServlet extends HttpServlet {
 		logger.info("doDelete: " + mToDelete.getUserName() + " : " + mToDelete.getDescription());
 		if (id != null && !"".equals(id)) {
 			mToDelete.setDescription("");
-			mToDelete.setId(-1);
+			mToDelete.setUserName("");
+			mToDelete.setId(-Integer.valueOf(mToDelete.getId()));
 			logger.info("Message was successfully deleted");
 			XMLHistoryUtil.getInstance().deleteMessageFromXML(id);
 		} else {
