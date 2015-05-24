@@ -1,12 +1,9 @@
-package bsu.fpmi.chat.controller;
+package bsu.fpmi.chat.dao;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,9 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
 
-import bsu.fpmi.chat.util.MessageUtil;
 import bsu.fpmi.chat.storage.xml.XMLHistoryUtil;
 
 import org.apache.log4j.Logger;
