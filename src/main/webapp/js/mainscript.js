@@ -23,7 +23,8 @@ function run()
 	document.addEventListener('click', delegateEvent);
 	var image = document.getElementById("myImage");
 	image.src = "images/serveron.png";
-	window.setInterval(function(){ restore(); }, 1000);
+	//window.setInterval(function(){  }, 1000);
+	restore();
 }
 
 function delegateEvent(evtObj)
@@ -195,7 +196,7 @@ function put(url, data, continueWith, continueWithError)
 }
 function erase(url, continueWith, continueWithError)
 {
-	ajax('DELETE', url, continueWith, continueWithError);
+	ajax('DELETE', url,null, continueWith, continueWithError);
 }
 function isError(text)
 {

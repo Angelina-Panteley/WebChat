@@ -37,7 +37,7 @@ public final class MessageUtil {
 		Object userName = json.get(USERNAME);
 
 		if (id != null && message != null && !id.toString().equals("-1")) {
-			return new Message(id.toString(), userName.toString(), message.toString());
+			return new Message(String.valueOf(id), userName.toString(), message.toString());
 		}
 		return null;
 	}
