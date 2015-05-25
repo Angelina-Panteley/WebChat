@@ -6,15 +6,15 @@ public class Message {
 	private String id;
 	private String description;
 	private String user;
+    private String user_id;
+    private String date;
 
-	private static int counter = 0;
-
-    	
-    public Message(String id, String userName, String message) {
+    public Message(String id, String userName, String message, String user_id, String date) {
     	this.id = id;
     	this.user = userName;
     	this.description = message;
-
+        this.user_id = user_id;
+        this.date = date;
     }
 	
     public Message(JSONObject json) {
@@ -35,7 +35,14 @@ public class Message {
     public String getDescription() {
     	return description;
     }
-    	
+    public String getDate() {
+        return date;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
     public void setId(int id) {
     	this.id = String.valueOf(id);
     }
@@ -46,5 +53,12 @@ public class Message {
 
     public void setDescription(String message) {
     	this.description = message;
+    }
+    public void setUser_id(int user_id) {
+        this.user_id = String.valueOf(user_id);
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

@@ -6,7 +6,20 @@
 	margin-bottom: 1%;
 	border-bottom: thin solid #D5D5D5;
 }
-body{}
+html, body {
+	height: 100%;
+}
+.main {
+	height: 100%;
+	width: 100%;
+	display: table;
+}
+.wrapper {
+	display: table-cell;
+	height: 100%;
+	vertical-align: middle;
+	align:center;
+}
 table{
 }
 
@@ -42,7 +55,9 @@ input.addMailButton:active {
 h1{
 	font-family:Showcard Gothic;color:#852A4B;text-align:center;background-color:#361451;
 }
-
+h6{
+	color:red;text-align:center;
+}
 fieldset{
 	background:#C12853;height:400px;width:90px;padding:10px;padding-bottom: 120px;
 }

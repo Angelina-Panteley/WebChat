@@ -3,7 +3,7 @@ var UserName = "New User";
 var MyID = -1;
 var lastID = 1;
 
-var theMessage = function(text)
+var theMessage = function(text,UserName)
 {
 	return {
 		description: text,
@@ -15,9 +15,61 @@ var theMessage = function(text)
 var appState = {
 	mainUrl : 'chat',
 	messageList: [],
-	token : 'TN11EN'
+	token : 'TN11EN',
+	user: localStorage.getItem('login')
 };
+var messagesWaiting = false;
+function getMessages(){
+	if(!messagesWaiting){
+		messagesWaiting = true;
+		var xmlhttp = new XMLHttpRequest();
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+				messagesWaiting = false;
+				console.assert(xmlhttp.responseText != null);
+				var response = JSON.parse(xmlhttp.responseText);
+				var messages = response.messages;
+				var items = document.getElementsByClassName('items')[0];
+				for (var i = 0; i < messages.length; ++i)
+				{
+					var message = messages[i];
 
+					if (i < appState.messageList.length)
+					{
+						var j;
+						for (j = 0; j < items.children.length; ++j)
+						{
+							if (items.children[j].attributes['data-task-id'].value == appState.messageList[i].id)
+								break;
+						}
+						if (message.id != appState.messageList[i].id)//deleted
+						{
+							appState.messageList[i] = message;
+							items.removeChild(items.children[j]);
+							//items.children.deleteRow(j);
+						}
+						else if (message.description != appState.messageList[i].description)//edited
+						{
+							appState.messageList[i].description = message.description;
+							items.children[j].innerHTML = '<table><tr><td style="width:25%"><b>' + message.user + ':</b></td><td width=70%  style="word-wrap: break-word" >' + message.description + '</td><td style="padding-left: 5px">                                            <img src="http://www.defaulticon.com/sites/default/files/styles/icon-front-page-32x32-preview/public/field/image/edit.png?itok=nb2eY85A" onClick="editMessage()" style="cursor: pointer"></img>                      <img src="http://www.defaulticon.com/sites/default/files/styles/icon-front-page-32x32-preview/public/field/image/eraser.png?itok=ohy0hMWI" onClick="deleteMessage()" style="cursor: pointer"</img>                      </td></tr></table>';
+							items.children[j].setAttribute('data-task-id', message.id);
+						}
+					}
+					else
+					{
+						addMailInternal(message);
+						appState.messageList.push(message);
+						lastID = message.id;
+					}
+				}
+				appState.token = response.token;
+			}
+		}
+		xmlhttp.open("GET",  appState.mainUrl + '?token=TN11EN', true);
+		xmlhttp.send();
+	}
+}
+setInterval(getMessages, 1000);
 function run()
 {
 	document.addEventListener('click', delegateEvent);
@@ -25,6 +77,7 @@ function run()
 	image.src = "images/serveron.png";
 	//window.setInterval(function(){  }, 1000);
 	restore();
+
 }
 
 function delegateEvent(evtObj)
@@ -43,6 +96,7 @@ function changeLogin()
 	if(UserName == "")
 		UserName = "New User";
 	document.getElementById("loginChanged").innerHTML = "Welcome to SweetChat, " + UserName + "!";
+	localStorage.setItem('login',UserName);
 }
 
 function onAddButtonClick()
@@ -52,12 +106,12 @@ function onAddButtonClick()
 		return;
 	if(MyID >= 0)
 	{
-		addChangedMessage(MyID, mailText.value);
+		addChangedMessage(MyID, mailText.value,appState.user);
 		MyID = -1;
 	}
 	else
 	{
-		var newMessage = theMessage(mailText.value);
+		var newMessage = theMessage(mailText.value,appState.user);
 		addMail(newMessage);
 	}
 	mailText.value = '';
@@ -68,9 +122,9 @@ function addMail(message)
 	post(appState.mainUrl, JSON.stringify(message), function(){ restore(); });
 }
 
-function addChangedMessage(id, text)
+function addChangedMessage(id, text,user)
 {
-	var m = theMessage(text);
+	var m = theMessage(text,user);
 	lastID--;
 	for (var i = 0; i < appState.messageList.length; ++i)
 	{
@@ -115,6 +169,7 @@ function deleteMessage()
 
 function editMessage()
 {
+	appState.isChanged = false;
 	var toEdit = event.target;
 	toEdit = toEdit.parentNode;
 	toEdit = toEdit.parentNode.parentNode.parentNode;
@@ -132,9 +187,11 @@ function editMessage()
 
 function restore(continueWith)
 {
+	//messagesWaiting = true;
 	var url = appState.mainUrl + '?token=TN11EN';
 	get(url, function(responseText)
 	{
+		//messagesWaiting = true;
 		console.assert(responseText != null);
 		var response = JSON.parse(responseText);
 		var messages = response.messages;

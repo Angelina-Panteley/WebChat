@@ -1,62 +1,26 @@
 <!DOCTYPE html>
 <html>
-<head>
-
+<head lang="en">
+  <meta charset="UTF-8">
   <link rel="stylesheet" type ="text/css" href="css/style.css">
-  <script src="js/mainscript.js"></script>
+  <script src="js/signup.js"></script>
+  <title>Welcome!</title>
 </head>
-<title>SweetChat</title></head>
+<body onload="run();" background="images/back.jpg" >
+<div class = "main" align="center"><div class = "wrapper" align="center">
+  <fieldset valign="center" align=center style="width:120px;height:100px;">
+    <p style="color:#FFCCCC;">Please, sign in</p>
+    <div align=center>
+      <p><input id="log" type="text" class="in" name="никнейм" placeholder="Login" maxlength="10" size="20" ></p>
+      <p><input id="pass" type="text" class="in" name="паспорт" placeholder="Password" maxlength="10" size="20" ></p>
+      <div id="divUnderPassword"></div>
+      <a href="#" id="signInBut" type="button"  class="button" >Sign In</a>
+      <a href="#" id="signUpBut" type="button"  class="button" >Sign Up</a>
 
-<body  onload="run();" background="images/back.jpg";><!--"https://pp.vk.me/c621816/v621816487/12e92/0r6FQ5yHksg.jpg";>-->
-<section class="chat">
-  <table width="100%"  align = center cellpadding=8px >
+    </div>
+  </fieldset>
+</div></div>
 
-    <caption align="center" ><h1 id="loginChanged">Welcome to Our Chat!</h1><caption>
-      <tr>
-        <td valign="top" align=center rowspan=3>
-          <form>
-            <fieldset>
-              <p style="color:#FFCCCC;">Enter your name</p>
-              <div align=center>
-                <p><input id="login" type="text" class="in" name="никнейм" placeholder="Login" maxlength="10" size="20" ></p>
-                <a href="#" id="loginButton" type="button"  class="button" onclick="changeLogin()">Save name</a>
-                <br><br><br><br><img id="myImage" align=center title="Connection with the server" onclick="Javascript:changeImage()" src="images/serveron.png" width="50" height="90">
-
-              </div>
-            </fieldset>
-          </form>
-        </td>
-
-        <td colspan=4 align=center>
-          <div id="messages" class="items" STYLE="overflow: scroll;  width:800px; height:350px;background-color:#FEB994 ;">
-            &nbsp;
-          </div>
-        </td>
-
-        <td style="width:120px;><!--"временно для индикации доступа сервера-->
-          </td>
-
-      </tr>
-
-      <tr>
-
-        <td></td>
-
-        <td colspan=2 align = right>
-
-          <p><textarea id="mailText" name="info"; style="width: 500px;height: 100px; " ></textarea></p>
-        </td>
-        <td style="width: 300px;"><p><input class="addMailButton" type="submit" id="addButton" name="next"  value="Send mail" style="height: 80px;"  ></input></p>
-        </td>
-
-        <td></td>
-
-      </tr>
-
-  </table>
-</section>
 
 </body>
-
 </html>
-

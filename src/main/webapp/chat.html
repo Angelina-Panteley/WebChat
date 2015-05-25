@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <link rel="stylesheet" type ="text/css" href="css/style.css">
+    <script src="js/mainscript.js"></script>
+</head>
+<title>SweetChat</title></head>
+
+<body  onload="run();" background="images/back.jpg";><!--"https://pp.vk.me/c621816/v621816487/12e92/0r6FQ5yHksg.jpg";>-->
+<section class="chat">
+    <table width="100%"  align = center cellpadding=8px >
+
+        <caption align="center" ><h1 id="loginChanged">Welcome to Our Chat!</h1><caption>
+            <tr>
+                <td valign="top" align=center rowspan=3>
+                    <form>
+                        <fieldset>
+                            <p style="color:#FFCCCC;">Enter your name</p>
+                            <div align=center>
+                                <p><input id="login" type="text" class="in" name="никнейм" placeholder="Login" maxlength="10" size="20" ></p>
+                                <a href="#" id="loginButton" type="button"  class="button" onclick="changeLogin()">Save name</a>
+
+                                <br><br><br><br><img id="myImage" align=center title="Connection with the server" onclick="Javascript:changeImage()" src="images/serveron.png" width="50" height="90">
+
+                            </div>
+                        </fieldset>
+                    </form>
+                </td>
+
+                <td colspan=4 align=center>
+                    <div id="messages" class="items" STYLE="overflow: scroll;  width:800px; height:350px;background-color:#FEB994 ;">
+                        &nbsp;
+                    </div>
+                </td>
+
+                <td style="width:120px;">
+                </td>
+
+            </tr>
+
+            <tr>
+
+                <td></td>
+
+                <td colspan=2 align = right>
+
+                    <p><textarea id="mailText" name="info"; style="width: 500px;height: 100px; " ></textarea></p>
+                </td>
+                <td style="width: 300px;"><p><input class="addMailButton" type="submit" id="addButton" name="next"  value="Send mail" style="height: 80px;"  ></input></p>
+                </td>
+
+                <td></td>
+
+            </tr>
+
+    </table>
+</section>
+
+</body>
+
+</html>

@@ -36,18 +36,20 @@ import bsu.fpmi.chat.util.ServletUtil;
 import org.xml.sax.SAXException;
 
 import static bsu.fpmi.chat.util.MessageUtil.*;
-
+import bsu.fpmi.chat.dao.MessageDao;
+import bsu.fpmi.chat.dao.MessageDaoImpl;
 @WebServlet(urlPatterns = {"/chat"}, asyncSupported = true)
 public final class ChatServlet extends HttpServlet {
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm ");
 	private List<AsyncContext> contexts = new LinkedList<AsyncContext>();
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(ChatServlet.class.getName());
-
+	private MessageDao messageDao;
 	@Override
 	public void init() {
 		try {
-			loadHistory();
+			this.messageDao = new MessageDaoImpl();
+			messageDao.loadHistory();
 		} catch (Exception e) {
 			logger.error(e);
 		}
@@ -123,8 +125,8 @@ public final class ChatServlet extends HttpServlet {
 			MessageStorage.addMessage(message);
 
 			Date currentDate = new Date();
-			logger.info("doPost: "+ message.getUserName() + " : " + message.getDescription());
-			XMLHistoryUtil.getInstance().addMessageToXML(message, currentDate);//а где для гета такое???я не трогал иксэмэль.слышишь.
+			logger.info("doPost: " + message.getUserName() + " : " + message.getDescription());
+			messageDao.add(message);
 			response.setStatus(HttpServletResponse.SC_OK);
 			completeAs(contexts);
 		} catch (ParseException e) {
@@ -143,11 +145,11 @@ public final class ChatServlet extends HttpServlet {
 			Message message = jsonToMessage(json);
 			String id = message.getId();
 			Date currentDate = new Date();
+			messageDao.update(message.getId(), message.getDescription());
 			logger.info("doPut: "+ message.getUserName() + " : " + message.getDescription());
 			Message mesToUpdate = MessageStorage.getMessageById(id);
 			if (mesToUpdate != null) {
 				mesToUpdate.setDescription(message.getDescription());
-				XMLHistoryUtil.editMessageInXML(mesToUpdate.getId(), mesToUpdate.getDescription());
 				response.setStatus(HttpServletResponse.SC_OK);
 				completeAs(contexts);
 			} else {
@@ -163,6 +165,7 @@ public final class ChatServlet extends HttpServlet {
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter(ID);
 		Date currentDate = new Date();
+		messageDao.delete(Integer.valueOf(id));
 		Message mToDelete = MessageStorage.getMessageById(id);
 		logger.info("doDelete: " + mToDelete.getUserName() + " : " + mToDelete.getDescription());
 		if (id != null && !"".equals(id)) {
@@ -170,7 +173,6 @@ public final class ChatServlet extends HttpServlet {
 			mToDelete.setUserName("");
 			mToDelete.setId(-Integer.valueOf(mToDelete.getId()));
 			logger.info("Message was successfully deleted");
-			XMLHistoryUtil.getInstance().deleteMessageFromXML(id);
 			completeAs(contexts);
 		} else {
 			logger.info("Message ID is out of bounds");
