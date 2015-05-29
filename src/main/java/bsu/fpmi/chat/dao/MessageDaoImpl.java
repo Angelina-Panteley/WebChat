@@ -23,6 +23,38 @@ import java.util.List;
 public class MessageDaoImpl implements MessageDao {
     private static Logger logger = Logger.getLogger(MessageDaoImpl.class.getName());
 
+    public String getUserId(String login, String password)
+    {
+        String user_table = "SELECT id FROM `users` where name = ? and password = ?";
+
+        Connection connection = null;
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        String id = null;
+        try {
+            connection = ConnectionManager.getConnection();
+            st = connection.prepareStatement(user_table);
+            st.setString(1, login);
+            st.setString(2, password);
+            rs = st.executeQuery();
+            while (rs.next()) {
+                id = rs.getString("id");
+            }
+        }
+        catch(Exception e) {
+            logger.error(e);
+        }
+        return id;
+    }
+
+    public boolean isUserExist(String name, String password)
+    {
+        String id = getUserId(name, password);
+        if(id == null)
+            return false;
+        return true;
+    }
+
     public void loadHistory()
     {
         String deleteSQL = "SELECT * FROM `messages`";
@@ -47,11 +79,12 @@ public class MessageDaoImpl implements MessageDao {
                 st.setString(1, user_id);
 
                 rs1 = st.executeQuery();
-                while (rs1.next()){
+                while (rs1.next()) {
                     name = rs1.getString("name");
                     System.out.println(name);
                 }
-                MessageStorage.addMessage(new Message(id, name, text,user_id, date));
+                //1if(Integer.parseInt(id)>0)
+                    MessageStorage.addMessage(new Message(id, name, text,user_id, date));
             }
         } catch (SQLException e) {
             logger.error(e);
@@ -190,9 +223,13 @@ public class MessageDaoImpl implements MessageDao {
         PreparedStatement statement = null;
         try {
             connection = ConnectionManager.getConnection();
-            statement = connection.prepareStatement("delete FROM `messages` where messages.id = ?");
-            statement.setInt(1, id);
-            statement.execute();
+            statement = connection.prepareStatement("Update Messages SET user_id = ? WHERE id = ?");
+            statement.setString(1, "0");
+            statement.setString(2, Integer.toString(id));
+            statement.executeUpdate();
+            //statement = connection.prepareStatement("delete FROM `messages` where messages.id = ?");
+            //statement.setInt(1, id);
+            //statement.execute();
         } catch (SQLException e) {
             logger.error(e);
         } finally {
@@ -213,4 +250,74 @@ public class MessageDaoImpl implements MessageDao {
         }
     }
 
+   public  void addDeletedUser()
+   {
+       Connection connection = null;
+       PreparedStatement preparedStatement = null;
+       String id = null;
+       try {
+           connection = ConnectionManager.getConnection();
+           preparedStatement = connection.prepareStatement("INSERT INTO `users` VALUES (?, ?, ?)");
+           id = Integer.toString(0);
+           preparedStatement.setString(1, id);
+           preparedStatement.setString(2, "");
+           preparedStatement.setString(3, "1");
+           preparedStatement.executeUpdate();
+       } catch (SQLException e) {
+           logger.error(e);
+       } finally {
+           if (preparedStatement != null) {
+               try {
+                   preparedStatement.close();
+               } catch (SQLException e) {
+                   logger.error(e);
+               }
+           }
+           if (connection != null) {
+               try {
+                   connection.close();
+               } catch (SQLException e) {
+                   logger.error(e);
+               }
+           }
+       }
+   }
+
+    public String getUserIdWhereId(Message message)
+    {
+        String s = "Select user_id from `messages` where id=?";
+        ResultSet rs = null;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        String uid = null;
+        try {
+            connection = ConnectionManager.getConnection();
+            preparedStatement = connection.prepareStatement(s);
+            preparedStatement.setString(1,message.getId());
+            rs = preparedStatement.executeQuery();
+            while(rs.next())
+            {
+                uid = rs.getString("user_id");
+            }
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error(e);
+        } finally {
+            if (preparedStatement != null) {
+                try {
+                    preparedStatement.close();
+                } catch (SQLException e) {
+                    logger.error(e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    logger.error(e);
+                }
+            }
+            return uid;
+        }
+    }
 }

@@ -54,8 +54,8 @@ public class Message {
     public void setDescription(String message) {
     	this.description = message;
     }
-    public void setUser_id(int user_id) {
-        this.user_id = String.valueOf(user_id);
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public void setDate(String date) {

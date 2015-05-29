@@ -63,7 +63,7 @@ public final class MessageUtil {
 		Object id = json.get(ID);
 		Object message = json.get(MESSAGE);
 		Object userName = json.get(USERNAME);
-		Object user_id = makeNewID(userName.toString());
+		Object user_id = makeNewID();
 		Object date = new Date();
 
 		if (id != null && message != null && !id.toString().equals("-1")) {
@@ -85,23 +85,12 @@ public final class MessageUtil {
 		return oldID;
 	}
 
-	public static int makeNewID(String userName)
+	public static int makeNewID()
 	{
 		try{
-			if(!ser)
-			{
-				ID_ui = 1;
-				check(userName);
-				ser = true;
-				serializeID();
-			}
-			else
-			{
 				int oldId = returnOldID();
 				ID_ui = oldId+1;
-				check(userName);
 				serializeID();
-			}
 		}
 		catch(Exception e){}
 		finally {return ID_ui;}
@@ -115,16 +104,19 @@ public final class MessageUtil {
 		os.close();
 	}
 
-	public static void check(String name)
+	public static String check(String name, String password)
 	{
 		Connection connection = null;
 		PreparedStatement preparedStatement = null;
+		String id = null;
 		try {
 			connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement("INSERT INTO users (id, name, password) VALUES (?, ?, ?)");
-			preparedStatement.setString(1, Integer.toString(ID_ui));
+			preparedStatement = connection.prepareStatement("INSERT INTO `users` VALUES (?, ?, ?)");
+			id = Integer.toString(makeNewID());
+			preparedStatement.setString(1, id);
 			preparedStatement.setString(2, name);
-			preparedStatement.setString(3, "1");
+
+				preparedStatement.setString(3, password);
 			preparedStatement.executeUpdate();
 		} catch (SQLException e) {
 			logger.error(e);
@@ -144,5 +136,6 @@ public final class MessageUtil {
 				}
 			}
 		}
+		return id;
 	}
 }

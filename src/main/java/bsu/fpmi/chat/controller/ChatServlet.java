@@ -1,8 +1,12 @@
 package bsu.fpmi.chat.controller;
 
-import java.io.File;
+import java.io.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,24 +24,23 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
-import bsu.fpmi.chat.util.MessageUtil;
 import bsu.fpmi.chat.storage.xml.XMLHistoryUtil;
 
 import org.apache.log4j.Logger;
 
 import bsu.fpmi.chat.model.Message;
 import bsu.fpmi.chat.model.MessageStorage;
+import bsu.fpmi.chat.util.ServletUtil;
+import static bsu.fpmi.chat.util.MessageUtil.*;
+import bsu.fpmi.chat.dao.MessageDao;
+import bsu.fpmi.chat.dao.MessageDaoImpl;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import bsu.fpmi.chat.util.ServletUtil;
-
 import org.xml.sax.SAXException;
 
-import static bsu.fpmi.chat.util.MessageUtil.*;
-import bsu.fpmi.chat.dao.MessageDao;
-import bsu.fpmi.chat.dao.MessageDaoImpl;
+
 @WebServlet(urlPatterns = {"/chat"}, asyncSupported = true)
 public final class ChatServlet extends HttpServlet {
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm ");
@@ -45,14 +48,26 @@ public final class ChatServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(ChatServlet.class.getName());
 	private MessageDao messageDao;
+
 	@Override
 	public void init() {
 		try {
 			this.messageDao = new MessageDaoImpl();
+			messageDao.addDeletedUser();
 			messageDao.loadHistory();
+		//	getUserId();
 		} catch (Exception e) {
 			logger.error(e);
 		}
+	}
+
+	private String getUserId() throws IOException, ClassNotFoundException
+	{
+		FileInputStream fileStream = new FileInputStream("user.txt");
+		ObjectInputStream os = new ObjectInputStream(fileStream);
+		String user_id = os.readObject().toString();
+		os.close();
+		return user_id;
 	}
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,11 +77,6 @@ public final class ChatServlet extends HttpServlet {
 
 			logger.info("doGet: token="+token+"; index="+index);
 			response.setCharacterEncoding("UTF-8");
-			//String messages = formResponse();
-			//response.setContentType(ServletUtil.APPLICATION_JSON);
-			//PrintWriter out = response.getWriter();
-			//out.print(messages);///token+listOfJSON
-			//out.flush();
 			final AsyncContext as = request.startAsync(request, response);
 			as.setTimeout(10*60*1000);
 			contexts.add(as);
@@ -79,7 +89,7 @@ public final class ChatServlet extends HttpServlet {
 
 				public void onTimeout(AsyncEvent event) throws IOException {
 					logger.info("timeout");
-					HttpServletResponse resp = (HttpServletResponse)as.getResponse();
+					HttpServletResponse resp = (HttpServletResponse) as.getResponse();
 					String messages = formResponse();
 					resp.setContentType(ServletUtil.APPLICATION_JSON);
 					PrintWriter out = resp.getWriter();
@@ -89,9 +99,8 @@ public final class ChatServlet extends HttpServlet {
 				}
 
 				public void onError(AsyncEvent event) throws IOException {
-
 					logger.info("error");
-					HttpServletResponse resp = (HttpServletResponse)as.getResponse();
+					HttpServletResponse resp = (HttpServletResponse) as.getResponse();
 					String messages = formResponse();
 					resp.setContentType(ServletUtil.APPLICATION_JSON);
 					PrintWriter out = resp.getWriter();
@@ -102,7 +111,6 @@ public final class ChatServlet extends HttpServlet {
 				}
 
 				public void onStartAsync(AsyncEvent event) throws IOException {
-
 				}
 			});
 			completeAs(contexts);
@@ -121,11 +129,12 @@ public final class ChatServlet extends HttpServlet {
 			JSONObject json = stringToJson(data);
 			Message message = jsonToMessage(json);
 
-			message.setId(MessageStorage.getSize() + 1);
+			//message.setId(MessageStorage.getSize() + 1);
 			MessageStorage.addMessage(message);
 
 			Date currentDate = new Date();
 			logger.info("doPost: " + message.getUserName() + " : " + message.getDescription());
+			message.setUser_id(getUserId());
 			messageDao.add(message);
 			response.setStatus(HttpServletResponse.SC_OK);
 			completeAs(contexts);
@@ -133,50 +142,61 @@ public final class ChatServlet extends HttpServlet {
 			logger.error("Invalid user message " + e.getMessage());
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
+		catch(ClassNotFoundException e){logger.error(e);}
 	}
 
 	@Override
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		String data = ServletUtil.getMessageBody(request);
+		String data = ServletUtil.getMessageBodyForEdit(request);
 
 		try {
 			JSONObject json = stringToJson(data);
 			Message message = jsonToMessage(json);
-			String id = message.getId();
-			Date currentDate = new Date();
-			messageDao.update(message.getId(), message.getDescription());
-			logger.info("doPut: "+ message.getUserName() + " : " + message.getDescription());
-			Message mesToUpdate = MessageStorage.getMessageById(id);
-			if (mesToUpdate != null) {
-				mesToUpdate.setDescription(message.getDescription());
-				response.setStatus(HttpServletResponse.SC_OK);
-				completeAs(contexts);
-			} else {
-				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Task does not exist");
+			String uid = messageDao.getUserIdWhereId(message);
+			if(getUserId().equals(uid)) {
+				String id = message.getId();
+				Date currentDate = new Date();
+				messageDao.update(message.getId(), message.getDescription());
+				logger.info("doPut: " + message.getUserName() + " : " + message.getDescription());
+				Message mesToUpdate = MessageStorage.getMessageById(id);
+				if (mesToUpdate != null) {
+					mesToUpdate.setDescription(message.getDescription());
+					response.setStatus(HttpServletResponse.SC_OK);
+					completeAs(contexts);
+				} else {
+					response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Task does not exist");
+				}
 			}
 		} catch (ParseException e) {//| ParserConfigurationException | SAXException | TransformerException | XPathExpressionException e) {
 			logger.error(e);
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 		}
+		catch(ClassNotFoundException e)
+		{logger.error(e);}
 	}
 
 	@Override
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter(ID);
 		Date currentDate = new Date();
-		messageDao.delete(Integer.valueOf(id));
-		Message mToDelete = MessageStorage.getMessageById(id);
-		logger.info("doDelete: " + mToDelete.getUserName() + " : " + mToDelete.getDescription());
-		if (id != null && !"".equals(id)) {
-			mToDelete.setDescription("");
-			mToDelete.setUserName("");
-			mToDelete.setId(-Integer.valueOf(mToDelete.getId()));
-			logger.info("Message was successfully deleted");
-			completeAs(contexts);
-		} else {
-			logger.info("Message ID is out of bounds");
-		}
+		try{
+		if(getUserId().equals(MessageStorage.getMessageById(id).getUser_id())) {
+
+			messageDao.delete(Integer.valueOf(id));
+			Message mToDelete = MessageStorage.getMessageById(id);
+			logger.info("doDelete: " + mToDelete.getUserName() + " : " + mToDelete.getDescription());
+			if (id != null && !"".equals(id)) {
+				mToDelete.setDescription("");
+				mToDelete.setUserName("");
+				logger.info("Message was successfully deleted");
+				completeAs(contexts);
+			} else {
+				logger.info("Message ID is out of bounds");
+			}
+		}}
+		catch(ClassNotFoundException e)
+		{logger.error(e);}
 	}
 	private void completeAs(List<AsyncContext> contexts) throws IOException {
 		for (AsyncContext context : contexts) {

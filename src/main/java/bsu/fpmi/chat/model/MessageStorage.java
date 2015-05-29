@@ -29,12 +29,15 @@ public final class MessageStorage {
 	public static List<JSONObject> getJSONlist() {
 		List<JSONObject> jsonList = new ArrayList<JSONObject>();
 		for(Message i : INSTANSE) {
-			JSONObject jsonObject = new JSONObject();
-			jsonObject.put("id", i.getId());
-			jsonObject.put("user", i.getUserName());
-			jsonObject.put("description", i.getDescription());
 
-			jsonList.add(jsonObject);
+			{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("id", i.getId());
+				jsonObject.put("user", i.getUserName());
+				jsonObject.put("description", i.getDescription());
+
+				jsonList.add(jsonObject);
+			}
 		}
 		return jsonList;
 	}
