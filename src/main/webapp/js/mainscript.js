@@ -1,13 +1,12 @@
 'use strict';
 var UserName = "New User";
 var MyID = -1;
-var lastID = 1;
 
 var theMessage = function(text,UserName)
 {
 	return {
 		description: text,
-		id: ++lastID,
+		id: appState.messageList.length + 1,
 		user: UserName
 	};
 };
@@ -42,7 +41,7 @@ function getMessages(){
 							if (items.children[j].attributes['data-task-id'].value == appState.messageList[i].id)
 								break;
 						}
-						if (message.id != appState.messageList[i].id)//deleted
+						if (message.user == "" && appState.messageList[i].user != "")//deleted
 						{
 							appState.messageList[i] = message;
 							items.removeChild(items.children[j]);
@@ -57,15 +56,17 @@ function getMessages(){
 					}
 					else
 					{
-						addMailInternal(message);
+						if (message.user != "")
+						{
+							addMailInternal(message);
+						}
 						appState.messageList.push(message);
-						lastID = message.id;
 					}
 				}
 				appState.token = response.token;
 			}
 		}
-		xmlhttp.open("GET",  appState.mainUrl + '?token=TN11EN', true);
+		xmlhttp.open("GET",  appState.mainUrl + '?token='+appState.token, true);
 		xmlhttp.send();
 	}
 }
@@ -84,19 +85,15 @@ function delegateEvent(evtObj)
 {
 	if(evtObj.type === 'click'
 		&& evtObj.target.classList.contains('button'))
-		changeLogin();
+		prevPage();
 	if(evtObj.type === 'click'
 		&& evtObj.target.classList.contains('addMailButton'))
 		onAddButtonClick();
 }
 
-function changeLogin()
+function prevPage()
 {
-	UserName = document.getElementById("login").value;
-	if(UserName == "")
-		UserName = "New User";
-	document.getElementById("loginChanged").innerHTML = "Welcome to SweetChat, " + UserName + "!";
-	localStorage.setItem('login',UserName);
+	window.location.href="index.html";
 }
 
 function onAddButtonClick()
@@ -125,7 +122,6 @@ function addMail(message)
 function addChangedMessage(id, text,user)
 {
 	var m = theMessage(text,user);
-	lastID--;
 	for (var i = 0; i < appState.messageList.length; ++i)
 	{
 		if (appState.messageList[i].id == id)
@@ -135,7 +131,8 @@ function addChangedMessage(id, text,user)
 			break;
 		}
 	}
-	put(appState.mainUrl, JSON.stringify(m), function(){ restore(); });
+	var url = appState.mainUrl + '?id=' + id;
+	put(url, JSON.stringify(m), function(){ restore(); });
 }
 
 function addMailInternal(message)
@@ -223,9 +220,11 @@ function restore(continueWith)
 			}
 			else
 			{
-				addMailInternal(message);
+				if (message.user != "")
+				{
+					addMailInternal(message);
+				}
 				appState.messageList.push(message);
-				lastID = message.id;
 			}
 		}
 		appState.token = response.token;
