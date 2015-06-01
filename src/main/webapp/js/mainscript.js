@@ -19,7 +19,7 @@ var appState = {
 };
 var messagesWaiting = false;
 function getMessages(){
-	if(!messagesWaiting){
+	//if(!messagesWaiting){
 		messagesWaiting = true;
 		var xmlhttp = new XMLHttpRequest();
 		xmlhttp.onreadystatechange=function(){
@@ -68,7 +68,7 @@ function getMessages(){
 		}
 		xmlhttp.open("GET",  appState.mainUrl + '?token='+appState.token, true);
 		xmlhttp.send();
-	}
+	//}
 }
 setInterval(getMessages, 1000);
 function run()
@@ -85,16 +85,27 @@ function delegateEvent(evtObj)
 {
 	if(evtObj.type === 'click'
 		&& evtObj.target.classList.contains('button'))
-		prevPage();
+		logout();
 	if(evtObj.type === 'click'
 		&& evtObj.target.classList.contains('addMailButton'))
 		onAddButtonClick();
 }
-
-function prevPage()
-{
-	window.location.href="index.html";
+function logout() {
+	var xmlhttp;
+	if (window.XMLHttpRequest) {
+		xmlhttp = new XMLHttpRequest();
+	} else {
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlhttp.onreadystatechange = function() {
+		if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+			window.location.reload();
+		}
+	}
+	xmlhttp.open("POST", "logout", true);
+	xmlhttp.send();
 }
+
 
 function onAddButtonClick()
 {

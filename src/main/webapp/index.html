@@ -6,17 +6,17 @@
   <script src="js/signup.js"></script>
   <title>Welcome!</title>
 </head>
-<body onload="run();" background="images/back.jpg" >
+<body background="images/back.jpg" >
 <div class = "main" align="center"><div class = "wrapper" align="center">
   <fieldset valign="center" align=center style="width:120px;height:100px;">
     <p style="color:#FFCCCC;">Please, sign in</p>
     <div align=center>
-      <p><input id="log" type="text" class="in" name="никнейм" placeholder="Login" maxlength="10" size="20" ></p>
-      <p><input id="pass" type="text" class="in" name="паспорт" placeholder="Password" maxlength="10" size="20" ></p>
+      <form action="login" method="post">
+      Login:<p><input id="log" type="text" class="in" name="login" placeholder="Login" maxlength="10" size="20" required></p>
+      Password:<p><input id="pass" type="password" class="in" name="password" placeholder="Password" maxlength="10" size="20" required></p>
       <div id="divUnderPassword"></div>
-      <a href="#" id="signInBut" type="button"  class="button" >Sign In</a>
-      <a href="#" id="signUpBut" type="button"  class="button" >Sign Up</a>
-
+        <input type="submit" id="signInBut" value="Sign In" class="button">
+      </form>
     </div>
   </fieldset>
 </div></div>
