@@ -42,7 +42,7 @@ public class MessageDaoImpl implements MessageDao {
             }
         }
         catch(Exception e) {
-            logger.error(e);
+            logger.error("An error occurred in function getUserId: " + e);
         }
         return id;
     }
@@ -81,26 +81,25 @@ public class MessageDaoImpl implements MessageDao {
                 rs1 = st.executeQuery();
                 while (rs1.next()) {
                     name = rs1.getString("name");
-                    System.out.println(name);
                 }
                 //1if(Integer.parseInt(id)>0)
                     MessageStorage.addMessage(new Message(id, name, text,user_id, date));
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("SQLException occurred while loading history: "+e);
         } finally {
             if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
         }
@@ -118,20 +117,20 @@ public class MessageDaoImpl implements MessageDao {
             preparedStatement.setString(4, Message.getDate());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("SQLException occurred while adding message: " + e);
         } finally {
             if (preparedStatement != null) {
                 try {
                     preparedStatement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
         }
@@ -147,20 +146,20 @@ public class MessageDaoImpl implements MessageDao {
             preparedStatement.setString(2, id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("SQLException occurred while updating message: " + e);
         } finally {
             if (preparedStatement != null) {
                 try {
                     preparedStatement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
         }
@@ -190,27 +189,27 @@ public class MessageDaoImpl implements MessageDao {
                 Messages.add(new Message(Integer.toString(id), user, text,Integer.toString(user_id), date));
             }
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("SQLException occurred while selecting messages: " + e);
         } finally {
             if (resultSet != null) {
                 try {
                     resultSet.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing resultSet: "+e);
                 }
             }
             if (statement != null) {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
         }
@@ -237,14 +236,14 @@ public class MessageDaoImpl implements MessageDao {
                 try {
                     statement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
         }
@@ -255,29 +254,31 @@ public class MessageDaoImpl implements MessageDao {
        Connection connection = null;
        PreparedStatement preparedStatement = null;
        String id = null;
-       try {
-           connection = ConnectionManager.getConnection();
-           preparedStatement = connection.prepareStatement("INSERT INTO `users` VALUES (?, ?, ?)");
-           id = Integer.toString(0);
-           preparedStatement.setString(1, id);
-           preparedStatement.setString(2, "");
-           preparedStatement.setString(3, "1");
-           preparedStatement.executeUpdate();
-       } catch (SQLException e) {
-           logger.error(e);
-       } finally {
-           if (preparedStatement != null) {
-               try {
-                   preparedStatement.close();
-               } catch (SQLException e) {
-                   logger.error(e);
+       if(!isUserExist("","1")) {
+           try {
+               connection = ConnectionManager.getConnection();
+               preparedStatement = connection.prepareStatement("INSERT INTO `users` VALUES (?, ?, ?)");
+               id = Integer.toString(0);
+               preparedStatement.setString(1, id);
+               preparedStatement.setString(2, "");
+               preparedStatement.setString(3, "1");
+               preparedStatement.executeUpdate();
+           } catch (SQLException e) {
+               logger.error("SQLException occurred while changing message(delete): " + e);
+           } finally {
+               if (preparedStatement != null) {
+                   try {
+                       preparedStatement.close();
+                   } catch (SQLException e) {
+                       logger.error("SQLException while closing statement: "+ e);
+                   }
                }
-           }
-           if (connection != null) {
-               try {
-                   connection.close();
-               } catch (SQLException e) {
-                   logger.error(e);
+               if (connection != null) {
+                   try {
+                       connection.close();
+                   } catch (SQLException e) {
+                       logger.error("SQLException while closing connection: "+ e);
+                   }
                }
            }
        }
@@ -301,20 +302,20 @@ public class MessageDaoImpl implements MessageDao {
             }
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error("SQLException occurred in function getUserIdWhereId: " + e);
         } finally {
             if (preparedStatement != null) {
                 try {
                     preparedStatement.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing statement: "+ e);
                 }
             }
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error("SQLException while closing connection: "+ e);
                 }
             }
             return uid;
